@@ -1,0 +1,515 @@
+<!--
+    Name - Don Thomas
+    Purpose - Project 1
+    Date - 09-Jan-2020
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<!--Head of the page-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA API</title>
+</head>
+<!--body of the page-->
+<body style="background-color: #f5f2d0;max-width: 70%;margin: 0 auto;">
+    <!--style tag-->
+    <style>
+        /*style for title*/
+        .cTitle{
+            width: 400px;
+            margin-top: -20px;
+            background-color: rgb(242, 242, 242);
+            padding: 5px
+            
+
+
+
+        }
+        option{
+            font-weight:bold;
+        }
+
+    </style>
+
+    <!--Start date-->
+    <h4 style="text-align: center;    padding-top: 20px;">From(dd-mm-yyyy)</h4>
+    <div style="text-align: center;font-weight: bold;">
+        
+        
+        <select id="idDay" style="font-weight: bold;">
+
+        </select>
+        <select id="idMonth" style="font-weight: bold;">
+            
+        </select>
+        <select id="idYear" style="font-weight: bold;">
+            <option value="2019">2019</option>
+            <option value="2020">2020</option>
+        </select>
+
+    </div>
+    <br>
+
+    <!--End date-->
+    <h4 style="text-align: center;">To(dd-mm-yyyy)</h4>
+    <div  style="text-align: center;font-weight: bold;">
+        
+        <select id="idDayEnd" style="font-weight: bold;">
+
+        </select>
+        <select id="idMonthEnd" style="font-weight: bold;">
+            
+        </select>
+        <select id="idYearEnd" style="font-weight: bold;">
+            <option value="2019">2019</option>
+            <option value="2020">2020</option>
+        </select>
+        <br><br>
+        <!--button-->
+        <button style="background-color: black;color: white;font-weight: bold;padding: 5px;" onclick="fnButton()">Get Title</button>
+        
+        <p style="color: red;text-align: center;" id="idError"></p>
+
+    </div>
+
+
+    <div style="text-align: center;">
+        <!--for title display-->
+        <form>
+            <h3>Select a Title:</h3>
+            <br>
+            <select class="cTitle" id="idTitle" size="10" onchange="fnSelectTitle(this.value)">
+                
+              
+            </select>
+          </form>
+    </div>
+
+    <!--Output-->
+    <div id="idOutPut">
+        <h1 style="text-align: center;" id="idHeading"></h1>
+        <p style="text-align: center;font-weight: bold;margin-top: -10px;" id="idDate"></p>
+        <div style="text-align: center;">
+        <img  id="idImage"/>
+        </div>
+        <h3 style="text-align: center;margin-top: 75px;" id="idExp"></h3>
+        <p style="background-color: rgb(242, 242, 242);padding: 10px;border:1px solid black;" id="idDescription"></p>
+        <h3 style="text-align: center;color: blue;text-decoration: underline;margin: 75px;" id="idCopyright"></h3>
+    </div>
+    
+    <script>
+        //array
+        var aTitle =[];
+        //arraycount
+        var titleCount = 0;
+        var jsonObject;
+        var countArray = 0;
+        //declartion for finding the same dates
+        var cMonthValue = 0;
+        var cdayValue = 0;
+        var cYearvalue = 0;
+        var cMonthEnd = 0;
+        var cDayEnd = 0;
+        var cYearEnd =0;
+        
+        //fn for display the selected title
+        function fnSelectTitle(valueFromTitle)
+        {
+            console.log(valueFromTitle);
+            //url
+            var url = "https://api.nasa.gov/planetary/apod?api_key=w0ro5X7MpRFZVYnT3Ij4SQaGtELUmHJsyFLQWaAq&hd=false&date=";
+                                            
+                                                    url = url + valueFromTitle;
+                                                    console.log("date "+url);
+
+            //fn calling
+            if(valueFromTitle=="")
+            {
+
+            }
+            else
+            {
+            JSONAsyncTitle(url);
+            }
+
+
+        }
+        
+        //fn for getting the title datas
+        function JSONAsyncTitle(url){
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function (){
+                //check if is finish & everything is ok
+                if(request.readyState ===4 && request.status ===200){
+                    //handle response text here.
+                    var jsonObject1 = JSON.parse(request.responseText);
+
+                    //display the data on id's
+                    document.getElementById("idHeading").innerHTML = jsonObject1.title;
+                    document.getElementById("idImage").src =jsonObject1.url;
+                    document.getElementById("idExp").innerHTML = "Explanation"
+                    document.getElementById("idDescription").innerHTML = jsonObject1.explanation;
+                    document.getElementById("idDate").innerHTML="("+jsonObject1.date+")";
+                    //condition for copyright
+                    if(jsonObject1.copyright==null)
+                    {
+                        document.getElementById("idCopyright").innerHTML = "Copyright - Unknown"; 
+                    }
+                    else
+                    {
+                        document.getElementById("idCopyright").innerHTML = "Copyright - ";
+                        document.getElementById("idCopyright").innerHTML += jsonObject1.copyright;
+                    }
+                    
+
+                }
+            }
+            //Open a connection using URL 
+            request.open("GET", url);
+            //send the GET request
+            request.send();
+        }
+
+        //fn for removing data from title's area
+        function fnRemoveFromArray()
+        {
+            var x = document.getElementById("idTitle");
+            //var x = document.getElementById("mySelect");
+            for(var i=x.length; i!=0;i--)
+            {
+            
+            aTitle.pop();
+             x.remove(x.length-1);
+             
+            }
+            console.log(aTitle);
+        }
+        
+
+
+        //function button
+        function fnButton()
+        {
+            //getting the value from the date 
+            var monthValue = document.getElementById("idMonth").value;
+            var dayValue = document.getElementById("idDay").value;
+            var yearValue = document.getElementById("idYear").value;
+            var monthEndValue = document.getElementById("idMonthEnd").value;
+            var dayEndValue = document.getElementById("idDayEnd").value;
+            var yearEndValue = document.getElementById("idYearEnd").value;
+            var count = 0;
+            //conditon for same value again
+            if(dayValue==cdayValue && monthValue==cMonthValue&& yearValue==cYearvalue && dayEndValue ==cDayEnd &&monthEndValue ==cMonthEnd&& yearEndValue == cYearvalue)
+            {
+                document.getElementById("idError").innerHTML = "";
+                console.log("same");
+                document.getElementById("idError").innerHTML = "Already selected the same date.";
+            }
+            else
+            {
+                
+            
+
+
+            var idTitleHere = document.getElementById("idTitle");
+            
+            //msg for error
+            document.getElementById("idError").innerHTML = "";
+            console.log(monthEndValue,monthValue);
+
+            //condition for month for from
+            if((monthValue== 2 && dayValue >= 28) || (monthValue == 4 ||monthValue == 6 ||monthValue == 9 || monthValue ==11) &&(dayValue>=31))
+            {
+                console.log(monthEndValue,monthValue,dayValue);
+                document.getElementById("idError").innerHTML = "Invaild date.";
+                count++;
+
+
+            }
+
+            //condition for month for to
+            if((monthEndValue== 2 && dayEndValue >= 28) || (monthEndValue == 4 ||monthEndValue == 6 ||monthEndValue == 9 || monthEndValue ==11) &&(dayEndValue>=31))
+            {
+                console.log(monthEndValue,monthValue,dayValue);
+                document.getElementById("idError").innerHTML = "Invaild date.";
+                count++;
+            }
+            //for the correct value
+            if(count==0)
+            {
+                //arrange into date format
+                var fromDate = new Date(yearValue, monthValue, dayValue);
+                var toDate = new Date(yearEndValue, monthEndValue, dayEndValue);
+                console.log(yearValue, monthValue, dayValue);
+                console.log(fromDate.getTime(),toDate.getTime());
+
+                var from = new Date(fromDate);
+                            var month = from.getMonth();
+                            var day = from.getDay();
+                            var year = from.getFullYear();
+                            console.log("direct "+ day+"-"+month+"-"+year);
+                
+                //finding the difference
+                var difference = toDate-fromDate;
+                difference = parseInt(difference);
+                console.log(difference);
+
+                console.log(fromDate,toDate);
+                //condition for the 1 month date
+                if(difference>(2629800000-(2*86400000)) || difference < 0)
+                {
+                    console.log("hello");
+                    document.getElementById("idError").innerHTML = "Please select less than 30 days.";
+                }
+                else
+                {
+                    //getting the value
+                    var currentDate = new Date();
+                var currentMilli = currentDate.getTime();
+
+                var startDate = new Date(yearValue,monthValue-1,dayValue);
+                var startMilli = startDate.getTime();
+
+                var endDate = new Date (yearEndValue,monthEndValue-1, dayEndValue);
+                var endMilli = endDate.getTime();
+
+                if(currentMilli<startMilli || currentMilli <endDate)
+                {
+                    document.getElementById("idError").innerHTML = "Please select valid date below than current date.";
+                    console.log("over date");
+                }
+                else
+                {
+
+                    //will execute the correct daya
+
+                      //fn for add data to array  
+                    function fnAddToArray()
+                    { 
+                        console.log(fromDate,toDate);
+                        //date
+                        var from = new Date(fromDate);
+                        var month = from.getMonth();
+                            var day = from.getDay();
+                            var year = from.getFullYear();
+                            console.log("out month "+ day+"-"+month+"-"+year);
+
+                        from = from.getTime();
+                        
+
+                        console.log(from);
+
+                        var to = new Date(toDate);
+                        to = to.getTime();
+
+                        console.log(from + " here "+ to);
+                        //console.log("here"+jsonObject.date);
+                        countArray = 0;
+
+                        //fn calling
+                        fnForIncrement();
+
+                        //fn for increment
+                        function fnForIncrement()
+                        {
+                            var count =32;
+                            var d1= dayValue;
+                            var d2= dayEndValue;
+                            var m1= monthValue;
+                            var m2=monthEndValue;
+
+                            var idTitleHere = document.getElementById("idTitle");
+                            var nwTitle = document.createElement('option');
+                            nwTitle.value="";
+                            nwTitle.innerHTML = "Please Select :";
+                            idTitleHere.appendChild(nwTitle);
+                            countArray++;
+                            //condition for display the titles for loop
+                            for(var i=d1;m1<=m2&&i<=count;i++)
+                            {
+                                
+                                //condition
+                                if(m1==m2)
+                                    {
+                                        if(i>d2)
+                                        {
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //display to title
+                                            console.log("date "+i+"-"+m1);
+                                            var url = "https://api.nasa.gov/planetary/apod?api_key=w0ro5X7MpRFZVYnT3Ij4SQaGtELUmHJsyFLQWaAq&hd=false&date=";
+                                            var date = year + "-"+ m1 + "-" + i;
+                                                    url = url + date;
+                                                    console.log("date "+i+"-"+url);
+                                                    getJSONAsync(url);
+                                            
+                                        }
+                                    }
+                                    else if(m1<m2)
+                                    {
+                                        if(i<=d2)
+                                        {
+                                            //display to title
+                                        console.log("date "+i+"-"+m1);
+                                        var url = "https://api.nasa.gov/planetary/apod?api_key=w0ro5X7MpRFZVYnT3Ij4SQaGtELUmHJsyFLQWaAq&hd=false&date=";
+                                            var date = year + "-"+ m1 + "-" + i;
+                                                    url = url + date;
+                                                    console.log("date "+i+"-"+url);
+                                                    getJSONAsync(url);
+
+                                        }
+                                        else if(i>d2&& i<=31)
+                                        {
+                                            //display to title
+                                            console.log("date1 "+i+"-"+m1);
+                                            var url = "https://api.nasa.gov/planetary/apod?api_key=w0ro5X7MpRFZVYnT3Ij4SQaGtELUmHJsyFLQWaAq&hd=false&date=";
+                                            var date = year + "-"+ m1 + "-" + i;
+                                                    url = url + date;
+                                                    console.log("date "+i+"-"+url);
+                                                    getJSONAsync(url);
+
+                                        }
+                                        else
+                                        {
+                                            m1++;
+                                            i=0;
+                                        console.log("hello" +i+m1);
+                                        }
+                                    }
+                                    
+                            }
+                        }
+                        
+                        //copying the data selectd date
+                        cMonthValue =monthValue;
+                        cdayValue = dayValue;
+                        cYearvalue = yearValue;
+                        cMonthEnd = monthEndValue;
+                        cDayEnd = dayEndValue;
+                        cYearEnd = yearEndValue;
+                        console.log("copy"+cdayValue,cMonthValue,cYearvalue);
+                        console.log(cDayEnd,cMonthEnd,cYearEnd);
+                    }
+                    //fn calling
+                    fnRemoveFromArray();
+                    fnAddToArray();
+                    
+
+                }
+                }
+            }
+            }
+            
+        }
+
+        //date code for dispaying
+
+       var idDayGet = document.getElementById('idDay');
+
+        for (var i = 1; i<=31; i++){
+            var optDay = document.createElement('option');
+            optDay.value = i;
+            optDay.innerHTML = i;
+            idDayGet.appendChild(optDay);
+        }
+        //date code for dispaying
+        var idMonthGet = document.getElementById('idMonth');
+
+        for (var i = 1; i<=12; i++){
+            var optMonth = document.createElement('option');
+            optMonth.value = i;
+            optMonth.innerHTML = i;
+            idMonthGet.appendChild(optMonth);
+        }
+        //date code for dispaying
+        var idDayGetEnd = document.getElementById('idDayEnd');
+
+        for (var i = 1; i<=31; i++){
+            var optDayEnd = document.createElement('option');
+            optDayEnd.value = i;
+            optDayEnd.innerHTML = i;
+            idDayGetEnd.appendChild(optDayEnd);
+        }
+        //date code for dispaying
+        var idMonthGetEnd = document.getElementById('idMonthEnd');
+
+        for (var i = 1; i<=12; i++){
+            var optMonthEnd = document.createElement('option');
+            optMonthEnd.value = i;
+            optMonthEnd.innerHTML = i;
+            idMonthGetEnd.appendChild(optMonthEnd);
+        }
+
+        //global
+        var tmpIndex =3;
+
+        //define your async ajax call fn
+
+        function getJSONAsync(url){
+
+            var idTitleHere = document.getElementById("idTitle");
+            
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function (){
+                //check if is finish & everything is ok
+                if(request.readyState ===4 && request.status ===200){
+                    //handle response text here.
+                    jsonObject = JSON.parse(request.responseText);
+                    console.log(jsonObject);
+                    var milli = new Date(jsonObject.date);
+                    milli = milli.getMonth();
+                    //document.getElementById("idAuthor").innerHTML = milli;
+                    //document.getElementById("idImage").src =jsonObject.url;
+
+                    aTitle[countArray]=jsonObject.title;
+
+                    console.log("title "+ aTitle[countArray]);
+                    
+                    //value to title
+                    var nwTitle = document.createElement('option');
+                            nwTitle.value = jsonObject.date;
+                            nwTitle.innerHTML = aTitle[countArray];
+                            idTitleHere.appendChild(nwTitle);
+                            countArray++;
+                    
+                    
+
+                    
+                    titleCount++;
+                    //condtion
+                    if(jsonObject.copyright == null)
+                    {
+                        console.log("null");
+                    }
+                    else
+                    {
+                        console.log("not null");
+                    }
+
+                    
+                    
+                }
+                
+            }
+            //Open a connection using URL 
+            request.open("GET", url);
+                    //using key
+                    
+                    //send the GET request
+                    request.send();
+
+
+                    return "jsonObject";
+        }
+        //helping fn
+        function helper(){
+            var url = "https://api.nasa.gov/planetary/apod?api_key=w0ro5X7MpRFZVYnT3Ij4SQaGtELUmHJsyFLQWaAq&date=2020-6-5&hd=false";
+            getJSONAsync(url);
+        }
+    </script>
+</body>
+</html>
